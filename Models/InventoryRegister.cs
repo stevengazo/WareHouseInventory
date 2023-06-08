@@ -12,5 +12,6 @@ class InventoryRegister
     public bool IsEntry { get; set; }
     public Inventory Inventory { get; set; }
     public int InventoryId { get; set; }
-
+    public DateTime Creation {get;set;}
+    public string Author {get;set;}
 }
