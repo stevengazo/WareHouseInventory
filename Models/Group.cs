@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace Models
 {
-    class Group
+    public class Group
     {
         [Key]
         [Required]

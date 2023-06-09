@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace Models;
 
-class WareHouse
+public class WareHouse
 {
     [Key]
     [Required]

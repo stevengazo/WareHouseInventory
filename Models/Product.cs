@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace Models
 {
-    class Product
+   public class Product
     {
         public int ProductId { get; set; }
         public string? Name { get; set; }
