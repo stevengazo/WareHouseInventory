@@ -1,43 +1,32 @@
 @model IEnumerable<Models.WareHouse>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Ubicaciones";
     Layout = "_LayoutAdmin";
 
 }
 
-<h1>Index</h1>
+<h1>Lista de Ubicaciones</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-outline-success" asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.WareHouseId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.WareHouseId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.WareHouseId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+
+
+<div class="d-flex flex-wrap gap-2">
+    @foreach (var item in Model)
+    {
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@item.Name</h5>
+            <p class="card-text">@item.Address</p>
+            <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.WareHouseId">Detalles</a> 
+            <a class="btn btn-sm btn-outline-success" asp-action="Edit" asp-route-id="@item.WareHouseId">Editar</a> 
+        </div>              
+    </div>
+    }
+</div>
+
+
+

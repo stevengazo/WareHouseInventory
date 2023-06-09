@@ -59,10 +59,11 @@ namespace Inventario.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InventoryId,Name,CreationDate,QuantityOfExistances,WareHouseId,ProductId")] Inventory inventory)
+        public async Task<IActionResult> Create([Bind("InventoryId,Name,CreationDate,WareHouseId,ProductId")] Inventory inventory)
         {
             if (ModelState.IsValid)
             {
+                inventory.QuantityOfExistances = 0;
                 _context.Add(inventory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

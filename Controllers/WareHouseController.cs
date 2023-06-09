@@ -35,14 +35,17 @@ namespace Inventario.Controllers
                 return NotFound();
             }
 
-            var wareHouse = await _context.WareHouses
-                .FirstOrDefaultAsync(m => m.WareHouseId == id);
+            var wareHouse = await _context.WareHouses.FirstOrDefaultAsync(m => m.WareHouseId == id);
             if (wareHouse == null)
             {
                 return NotFound();
-            }
-
+            }else{
+            wareHouse.Inventories = await (from I in _context.Inventories 
+                                                where I.WareHouseId == wareHouse.WareHouseId
+                                                select I
+                                                ).Include(I=>I.Product).ToListAsync();
             return View(wareHouse);
+            }
         }
 
         // GET: WareHouse/Create

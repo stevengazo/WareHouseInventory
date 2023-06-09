@@ -8,43 +8,54 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>Inventory</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreationDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreationDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.QuantityOfExistances)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.QuantityOfExistances)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.WareHouse)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.WareHouse.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Product)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Product.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.InventoryId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="d-flex flex-column">
+    <div class="col">
+        <div class="d-flex flex-column">
+            <div class="col">
+                <div>
+                    <h4>Inventory</h4>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-2">
+                            Nombre Registro
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Name)
+                        </dd>
+                        <dt class="col-sm-2">
+                            Fecha Inscripcion en Almacen
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.CreationDate)
+                        </dd>
+                        <dt class="col-sm-2">
+                            Existencias
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model =>
+                            model.QuantityOfExistances)
+                        </dd>
+                        <dt class="col-sm-2">
+                            Nombre del Almacen
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.WareHouse.Name)
+                        </dd>
+                        <dt class="col-sm-2">
+                            Descripción de Producto
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Product.Description)
+                        </dd>
+                    </dl>
+                </div>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model?.InventoryId">Edit</a>
+                    |
+                    <a asp-action="Index">Back to List</a>
+                </div>
+            </div>
+            <div class="col">
+                    <!-- Entrada y Salidas -->
+            </div>
 </div>

@@ -46,6 +46,37 @@ namespace Inventario.Controllers
         }
 
         // GET: Entry/Create
+        public async Task< IActionResult> Createbyinventory(string id)
+        {
+            ViewBag.Inventory = await _context.Inventories.Where(I=>I.InventoryId == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            return View();
+        }
+
+
+        // POST: Entry/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Createbyinventory([Bind("EntryId,Quantity,LoteCode,Author,Notes,InventoryId")] Entry entry)
+        {
+            if (ModelState.IsValid)
+            {
+                entry.CreationDate = DateTime.Now;
+                Inventory tmp = _context.Inventories.Where(I=>I.InventoryId == entry.InventoryId).FirstOrDefault();
+                tmp.QuantityOfExistances = tmp.QuantityOfExistances + entry.Quantity;
+                _context.Inventories.Update(tmp);
+                _context.Add(entry);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", entry.InventoryId);
+            return View(entry);
+        }
+
+
+
+        // GET: Entry/Create
         public IActionResult Create()
         {
             ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name");

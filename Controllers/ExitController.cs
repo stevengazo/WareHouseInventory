@@ -46,6 +46,43 @@ namespace Inventario.Controllers
         }
 
         // GET: Exit/Create
+        public async Task<IActionResult> CreatebyInventory(string id)
+        {
+            var tmp = await _context.Inventories.Where(I=>I.InventoryId == Convert.ToInt32(id) ).FirstOrDefaultAsync();           
+            ViewBag.Inventory = tmp;
+            ViewBag.Error= string.Empty;
+            return View();
+        }
+        // POST: Exit/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatebyInventory([Bind("ExistsId,Quantity,Author,CustomerName,Notes,InventoryId")] Exit exit)
+        {
+            if (ModelState.IsValid)
+            {
+                exit.CreationDate = DateTime.Now;
+                Inventory temp = await _context.Inventories.Where(I=>I.InventoryId == exit.InventoryId ).FirstOrDefaultAsync();           
+                bool QuantityValid = ((temp.QuantityOfExistances - exit.Quantity ) >=0)  ? true : false;
+                if(QuantityValid){
+                    temp.QuantityOfExistances = temp.QuantityOfExistances - exit.Quantity;
+                    _context.Inventories.Update(temp);
+                    _context.Add(exit);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }else{
+
+                    ViewBag.Inventory = temp;
+                    ViewBag.Error= "La Cantidad excede las existencias";
+                    return View();
+                }                
+            }
+            ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", exit.InventoryId);
+            return View(exit);
+        }
+
+        // GET: Exit/Create
         public IActionResult Create()
         {
             ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name");
