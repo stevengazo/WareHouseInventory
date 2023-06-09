@@ -5,20 +5,18 @@ namespace Models.DataBaseContext
 {
     public class WareHouseDataContext : DbContext
     {
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<InventoryRegister> InventoryRegisters { get; set; }
-        public DbSet<Product> Products { get; set; }
-
-        public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<WareHouse> WareHouses { get; set; }
+        public DbSet<Entry>? Entries { get; set; }
+        public DbSet<Exit>? Exits { get; set; }
+        public DbSet<Group>? Groups { get; set; }
+        public DbSet<Inventory>? Inventories { get; set; }
+        public DbSet<Photo>? Photos { get; set; }
+        public DbSet<Product>? Products { get; set; }
+        public DbSet<User>? Users { get; set; }
+        public DbSet<WareHouse>? WareHouses { get; set; }
 
         public WareHouseDataContext(DbContextOptions<WareHouseDataContext> options) : base(options)
         {
         }
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Inventario.Models;
-
 namespace Models
 {
   public   class User
@@ -13,7 +11,7 @@ namespace Models
         [Required]
         [MaxLength(30)]
         public string? Name {get;set;}
-        public string LastName {get;set;}
+        public string? LastName {get;set;}
         public string? Password {get;set;}
         public string? UserImagePath {get;set;}
         public bool Enable { get; set; }
