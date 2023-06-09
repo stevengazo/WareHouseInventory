@@ -38,6 +38,15 @@ namespace Inventario.Controllers
                 .Include(i => i.Product)
                 .Include(i => i.WareHouse)
                 .FirstOrDefaultAsync(m => m.InventoryId == id);
+            ViewBag.Exits = await (from E in _context.Exits
+                                   where E.InventoryId == inventory.InventoryId
+                                   orderby E.CreationDate descending
+                                   select E
+                                    ).Take(20).ToListAsync();
+            ViewBag.Entries = await (from E in _context.Entries
+                                     where E.InventoryId == inventory.InventoryId
+                                     orderby E.CreationDate descending
+                                     select E).Take(20) .ToListAsync();
             if (inventory == null)
             {
                 return NotFound();
@@ -162,14 +171,14 @@ namespace Inventario.Controllers
             {
                 _context.Inventories.Remove(inventory);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool InventoryExists(int id)
         {
-          return (_context.Inventories?.Any(e => e.InventoryId == id)).GetValueOrDefault();
+            return (_context.Inventories?.Any(e => e.InventoryId == id)).GetValueOrDefault();
         }
     }
 }

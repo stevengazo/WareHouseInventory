@@ -70,18 +70,30 @@
                         <td>
                            $ @item.Product.Sell_Price
                         </td>
-                        <td>
-                           $ @item.QuantityOfExistances
-                        </td>
+
+                         @{var isvalid = (item.QuantityOfExistances >=1) ?  true: false; }
+                            @if (isvalid)
+                            {
+                                <td>
+                                    @item.QuantityOfExistances
+                                </td>
+                            }else{
+                                <td class="text-danger">
+                                    No Hay Existencias
+                                </td>
+                            }
+
                         <td>
                             @{ var total = item.QuantityOfExistances  * item.Product.Sell_Price;}
                             $ @total
 
                         </td>
                         <td>
-                          <a class="btn bt-sm btn-outline-info" asp-controller="Inventory" asp-action="Details" asp-route-id="@item.InventoryId">Ver</a> 
+                          <a class="btn btn-sm btn-outline-info" asp-controller="Inventory" asp-action="Details" asp-route-id="@item.InventoryId">Ver Registro</a> 
                           <a class="btn bt-sm btn-outline-success" asp-controller="Entry" asp-action="Createbyinventory" asp-route-id="@item.InventoryId">Entrada</a> 
-                          <a class="btn bt-sm btn-outline-danger" asp-controller="Inventory" asp-action="Details" asp-route-id="@item.InventoryId">Salida</a> 
+                           @if(isvalid){
+                                    <a class="btn btn-sm btn-outline-danger" asp-controller="Exit" asp-action="CreatebyInventory" asp-route-id="@item.InventoryId">Salida</a> 
+                                }  
                         </td>
                     </tr>
                 }

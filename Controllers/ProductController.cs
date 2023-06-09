@@ -37,6 +37,9 @@ namespace Inventario.Controllers
 
             var product = await _context.Products
                 .FirstOrDefaultAsync(m => m.ProductId == id);
+                var inventories  = await    (from i in _context.Inventories where i.ProductId == product.ProductId select i ).Include(i=>i.WareHouse).ToListAsync();
+            ViewBag.Inventory = inventories;
+            ViewBag.WareHouses =  (from i in inventories select i.WareHouse ).Distinct().ToList();
             if (product == null)
             {
                 return NotFound();

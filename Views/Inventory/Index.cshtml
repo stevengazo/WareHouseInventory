@@ -4,6 +4,7 @@
     ViewData["Title"] = "Index";
     Layout = "_LayoutAdmin";
     var Warehouses = (from i in Model select i.WareHouse).Distinct().ToList();
+    int counter = 0;
 }
 
 <h1>Lista de Inventarios</h1>
@@ -15,16 +16,17 @@
 
 @foreach (var warehouse in Warehouses)
 {
-
+    counter = counter + 1;
+    string dat = $"collapse{counter.ToString()}";
     var inventories = (from i in Model where i.WareHouseId == warehouse.WareHouseId select i).ToList();
     <div class="accordion" id="accordionExample">
     <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-            @warehouse.Name - @warehouse.WareHouseId
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@dat" aria-expanded="true" aria-controls="@dat">
+            N° Almacen @warehouse.WareHouseId -  @warehouse.Name 
         </button>
         </h2>
-        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+        <div id="@dat" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
         <div class="accordion-body">
             <table class="table table-light">
                     <thead class="thead-light">
@@ -38,6 +40,9 @@
                             <th>
                                 Precio Venta Unitario
                             </th>
+                            <th>
+                                Precio Total
+                            </th>                            
                             <th>
                                 Acciones
                             </th>                            
@@ -65,19 +70,19 @@
                                $ @itemInventory.Product.Sell_Price
                             </td>  
                             <td>
+                                @{var totalPrice = itemInventory.Product.Sell_Price * itemInventory.QuantityOfExistances; }
+                               $ @totalPrice
+                            </td>  
+                            <td>
                                 <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@itemInventory.InventoryId">Ver Registro</a> 
                                 <a class="btn btn-sm btn-outline-success" asp-controller="Entry" asp-action="Createbyinventory" asp-route-id="@itemInventory.InventoryId">Entrada</a> 
                                 @if(isvalid){
                                     <a class="btn btn-sm btn-outline-danger" asp-controller="Exit" asp-action="CreatebyInventory" asp-route-id="@itemInventory.InventoryId">Salida</a> 
-                                }
-                                
+                                }   
                             </td>
                         </tr>
-                
             }    </tbody>
                 </table>
-            
-
         </div>
         </div>
     </div>

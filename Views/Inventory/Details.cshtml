@@ -1,5 +1,7 @@
 @model Models.Inventory
 
+@using Models;
+
 @{
     ViewData["Title"] = "Details";
     Layout = "_LayoutAdmin";
@@ -56,6 +58,82 @@
                 </div>
             </div>
             <div class="col">
-                    <!-- Entrada y Salidas -->
+                <!-- Entrada y Salidas -->
             </div>
+        </div>
+    </div>
+    <div class="col d-flex flex-col gap-2">
+        <div class="col rounded border ">
+        <h2>
+            Entradas De Productos    
+        </h2>
+         <table class="table table-light">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Autor</th>
+                        <th>Cantidad</th>
+                        <th>Lote</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Entry item in @ViewBag.Entries)
+                    {
+                    <tr>
+                        <td>
+                            @item.Author
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>         
+                        <td>
+                            @item.LoteCode
+                        </td>   
+                        <td>
+                            @item.CreationDate.ToLongDateString()
+                        </td>                                                
+                    </tr>    
+                    }
+                    
+                </tbody>
+            </table>
+        </div>
+        <div class="col rounded border ">
+            <h2>
+                Salidas de Productos
+            </h2>            
+            <table class="table table-light">
+                <thead class="thead-light">
+                    <tr>
+                        <th>
+                            Persona
+                        </th>
+                        <th>
+                            Cantidad
+                        </th>
+                        <th>
+                            Fecha
+                        </th>                                                
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Exit item in @ViewBag.Exits)
+                    {
+                    <tr>
+                        <td>
+                            @item.Author
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>
+                            @item.CreationDate.ToLongDateString()
+                        </td>                        
+                    </tr>                        
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
