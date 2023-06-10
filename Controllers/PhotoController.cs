@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using Models;
 using Models.DataBaseContext;
 
@@ -21,7 +22,7 @@ namespace Inventario.Controllers
 
         // GET: Photo
         public async Task<IActionResult> Index()
-        {
+        {            
             var wareHouseDataContext = _context.Photos.Include(p => p.Product);
             return View(await wareHouseDataContext.ToListAsync());
         }
@@ -58,7 +59,14 @@ namespace Inventario.Controllers
         public async Task<IActionResult> CreateByProduct([Bind("PhotoId,Image,FilePath,ProductId")] PhotoSender photo)
         {
             if (ModelState.IsValid)
-            {                
+            {     
+                IFormFile Image = photo.Image;
+                 string path = AppDomain.CurrentDomain.BaseDirectory;
+                 var direc = Directory.GetDirectories(path);
+                 path =  $"{path}\\Content\\Imag\\sample.fxt";
+                string[] pathes = Directory.GetDirectories(path); // get collection
+                System.IO.File.Create(path);
+                
                 _context.Add(photo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

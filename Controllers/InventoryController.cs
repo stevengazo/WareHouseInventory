@@ -80,7 +80,7 @@ namespace Inventario.Controllers
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", inventory.ProductId);
             ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address", inventory.WareHouseId);
             return View(inventory);
-        }
+        }        
 
         // GET: Inventory/Edit/5
         public async Task<IActionResult> Edit(int? id)
