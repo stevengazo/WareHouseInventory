@@ -192,9 +192,19 @@ namespace Inventario.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "ProductId", "Buy_Price", "Description", "Name", "Sell_Price" },
+                values: new object[] { 1, 1.0, "Sample", "Sample", 2.0 });
+
+            migrationBuilder.InsertData(
+                table: "Photos",
+                columns: new[] { "PhotoId", "FilePath", "ProductId" },
+                values: new object[] { 1, "./photos/default.png", 1 });
+
+            migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Enable", "GroupsUserId", "LastLogin", "LastName", "Name", "Password", "UserImagePath", "UserName" },
-                values: new object[] { 1, true, 1, new DateTime(2023, 6, 9, 10, 43, 34, 118, DateTimeKind.Local).AddTicks(1188), "", "", "admin", null, "admin" });
+                values: new object[] { 1, true, 1, new DateTime(2023, 6, 9, 19, 14, 2, 553, DateTimeKind.Local).AddTicks(2211), "", "", "admin", null, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entries_InventoryId",

@@ -1,3 +1,5 @@
+@using System;
+@using System.IO;
 @model IEnumerable<Models.Product>
 
 @{
@@ -17,8 +19,9 @@
 <div class="d-flex flex-wrap gap-2">
     @foreach (var item in Model)
     {
+        string pathImage = (  item.ProductImages.FirstOrDefault() == null) ?  Url.Content("/Content/Image/default.png")  : Url.Content(item.ProductImages.FirstOrDefault().FilePath) ;                
     <div class="card" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
+        <img src="@pathImage" class="card-img-top w-50 h-0"  alt="...">
         <div class="card-body">
             <h5 class="card-title">@item.Name</h5>
             <p class="card-text"> Precio Venta: $ @item.Sell_Price</p>

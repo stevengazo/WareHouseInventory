@@ -12,7 +12,7 @@ using Models.DataBaseContext;
 namespace Inventario.Migrations
 {
     [DbContext(typeof(WareHouseDataContext))]
-    [Migration("20230609164334_InitialCreate")]
+    [Migration("20230610011403_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -191,6 +191,14 @@ namespace Inventario.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Photos");
+
+                    b.HasData(
+                        new
+                        {
+                            PhotoId = 1,
+                            FilePath = "./photos/default.png",
+                            ProductId = 1
+                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -220,6 +228,16 @@ namespace Inventario.Migrations
                     b.HasKey("ProductId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductId = 1,
+                            Buy_Price = 1.0,
+                            Description = "Sample",
+                            Name = "Sample",
+                            Sell_Price = 2.0
+                        });
                 });
 
             modelBuilder.Entity("Models.User", b =>
@@ -269,7 +287,7 @@ namespace Inventario.Migrations
                             UserId = 1,
                             Enable = true,
                             GroupsUserId = 1,
-                            LastLogin = new DateTime(2023, 6, 9, 10, 43, 34, 118, DateTimeKind.Local).AddTicks(1188),
+                            LastLogin = new DateTime(2023, 6, 9, 19, 14, 2, 553, DateTimeKind.Local).AddTicks(2211),
                             LastName = "",
                             Name = "",
                             Password = "admin",

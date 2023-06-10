@@ -44,9 +44,31 @@ namespace Inventario.Controllers
 
             return View(photo);
         }
+        public IActionResult Create()
+        {
+            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description");
+            return View();
+        }
+
+    // POST: Photo/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateByProduct([Bind("PhotoId,Image,FilePath,ProductId")] PhotoSender photo)
+        {
+            if (ModelState.IsValid)
+            {                
+                _context.Add(photo);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", photo.ProductId);
+            return View(photo);
+        }
 
         // GET: Photo/Create
-        public IActionResult Create()
+        public IActionResult CreateByProduct()
         {
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description");
             return View();

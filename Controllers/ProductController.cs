@@ -22,9 +22,16 @@ namespace Inventario.Controllers
         // GET: Product
         public async Task<IActionResult> Index()
         {
-              return _context.Products != null ? 
-                          View(await _context.Products.ToListAsync()) :
-                          Problem("Entity set 'WareHouseDataContext.Products'  is null.");
+            var data = (from P in _context.Products
+                        select P).Include(P=>P.ProductImages).ToList();
+            if (data == null)
+            {
+                return Problem("Entity set 'WareHouseDataContext.Products'  is null.");
+            }
+            else
+            {
+              return  View(await _context.Products.ToListAsync());
+            }
         }
 
         // GET: Product/Details/5
@@ -35,11 +42,12 @@ namespace Inventario.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
+            var product = await _context.Products.Include(P => P.ProductImages)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
-                var inventories  = await    (from i in _context.Inventories where i.ProductId == product.ProductId select i ).Include(i=>i.WareHouse).ToListAsync();
+            var inventories = await (from i in _context.Inventories where i.ProductId == product.ProductId select i).Include(i => i.WareHouse).ToListAsync();
             ViewBag.Inventory = inventories;
-            ViewBag.WareHouses =  (from i in inventories select i.WareHouse ).Distinct().ToList();
+            ViewBag.WareHouses = (from i in inventories select i.WareHouse).Distinct().ToList();
+
             if (product == null)
             {
                 return NotFound();
@@ -62,7 +70,7 @@ namespace Inventario.Controllers
         public async Task<IActionResult> Create([Bind("ProductId,Name,Description,Buy_Price,Sell_Price")] Product product)
         {
             if (ModelState.IsValid)
-            {
+            {                                
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -153,14 +161,14 @@ namespace Inventario.Controllers
             {
                 _context.Products.Remove(product);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-          return (_context.Products?.Any(e => e.ProductId == id)).GetValueOrDefault();
+            return (_context.Products?.Any(e => e.ProductId == id)).GetValueOrDefault();
         }
     }
 }
