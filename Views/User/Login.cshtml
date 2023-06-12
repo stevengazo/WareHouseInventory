@@ -1,0 +1,26 @@
+@model Models.User
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_LayoutAdmin";
+}
+
+<h1>Iniciar Sesión</h1>
+
+<form asp-action="Login">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+      <label for="" class="form-label">Usuario</label>
+      <input asp-for="UserName" type="text" id="" class="form-control" placeholder="" aria-describedby="helpId">
+      <small id="helpId" class="text-muted"></small>
+    </div>
+    <div class="mb-3">
+      <label for="" class="form-label">Usuario</label>
+      <input asp-for="Password" type="password"  id="" class="form-control" placeholder="Sample" aria-describedby="helpId"> </input>
+      <small id="helpId" class="text-muted">Contacta con un administrador si no la recuerdas</small>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-outline-info" />
+    </div>
+</form>
+

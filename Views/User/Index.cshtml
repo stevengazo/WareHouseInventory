@@ -9,36 +9,27 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-outline-info" asp-action="Create">Crear Nuevo Usuario</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserName)
+                Usuario
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Nombre
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                Apellidos
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Password)
+                Esta Activo
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserImagePath)
+                Ultima sesión
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Enable)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastLogin)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GroupsUser)
-            </th>
-            <th></th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -54,24 +45,15 @@
                 @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Password)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserImagePath)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Enable)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LastLogin)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.GroupsUser.GroupsUserId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
+                <a class="btn btn-outline-success" asp-action="Edit" asp-route-id="@item.UserId">Editar</a> |
+                <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@item.UserId">Detalles</a> |
+                <a class="btn btn-outline-danger"  asp-action="Delete" asp-route-id="@item.UserId">Eliminar</a>
             </td>
         </tr>
 }

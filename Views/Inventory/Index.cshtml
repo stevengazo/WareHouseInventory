@@ -55,7 +55,7 @@
                             <td>
                                 @itemInventory.Product.Name
                             </td>
-                            @{var isvalid = (itemInventory.QuantityOfExistances >=1) ?  true: false; }
+                            @{bool isvalid = (itemInventory.QuantityOfExistances >=1) ?  true: false; }
                             @if (isvalid)
                             {
                                 <td>

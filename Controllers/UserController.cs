@@ -26,6 +26,24 @@ namespace Inventario.Controllers
             return View(await wareHouseDataContext.ToListAsync());
         }
 
+[HttpGet]
+        public async Task<IActionResult> Login()
+        {
+            return View();
+        }
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> Login([Bind("UserName,Password")] User user)
+        {
+            string Password = (string.IsNullOrEmpty(user.Password)) ? string.Empty: user.Password;
+            string UserName = (string.IsNullOrEmpty(user.UserName)) ? string.Empty: user.UserName;
+            if(!string.IsNullOrEmpty(Password) && !string.IsNullOrEmpty(UserName)){
+                // do some logic
+                return View();
+            }else{
+                return View();
+            }            
+        }
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
