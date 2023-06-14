@@ -26,6 +26,31 @@ namespace Inventario.Controllers
             return View(await wareHouseDataContext.ToListAsync());
         }
 
+
+        private async Task<bool> ExistsRegister(int WareHouseId, int ProductId)
+        {
+            try
+            {
+                var query = await (from i in _context.Inventories
+                                   where i.ProductId == ProductId && i.WareHouseId == WareHouseId
+                                   select i
+                ).FirstOrDefaultAsync();
+                if (query != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (System.Exception f)
+            {
+                Console.WriteLine(f.Message);
+                return true;
+            }
+        }
+
         // GET: Inventory/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -46,7 +71,7 @@ namespace Inventario.Controllers
             ViewBag.Entries = await (from E in _context.Entries
                                      where E.InventoryId == inventory.InventoryId
                                      orderby E.CreationDate descending
-                                     select E).Take(20) .ToListAsync();
+                                     select E).Take(20).ToListAsync();
             if (inventory == null)
             {
                 return NotFound();
@@ -60,6 +85,7 @@ namespace Inventario.Controllers
         {
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description");
             ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address");
+            ViewBag.ErrorMessage="";
             return View();
         }
 
@@ -72,15 +98,27 @@ namespace Inventario.Controllers
         {
             if (ModelState.IsValid)
             {
-                inventory.QuantityOfExistances = 0;
-                _context.Add(inventory);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                bool Exist = await ExistsRegister(inventory.WareHouseId, inventory.ProductId);
+                if (!Exist)
+                {
+                    inventory.QuantityOfExistances = 0;
+                    _context.Add(inventory);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", inventory.ProductId);
+                    ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address", inventory.WareHouseId);
+                    ViewBag.ErrorMessage = "El producto ya se encuentra registrado en ese almacen";
+                    return View(inventory);
+                }
             }
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", inventory.ProductId);
             ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address", inventory.WareHouseId);
+            ViewBag.ErrorMessage= "";
             return View(inventory);
-        }        
+        }
 
         // GET: Inventory/Edit/5
         public async Task<IActionResult> Edit(int? id)
