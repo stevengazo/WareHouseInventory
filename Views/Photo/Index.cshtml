@@ -15,9 +15,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FilePath)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Product)
             </th>
             <th></th>
@@ -26,9 +23,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FilePath)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Product.Description)
             </td>
