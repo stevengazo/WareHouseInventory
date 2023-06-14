@@ -22,7 +22,9 @@ namespace Inventario.Controllers
         // GET: Exit
         public async Task<IActionResult> Index()
         {            
-            var wareHouseDataContext = _context.Exits.Include(e => e.Inventory);
+            var wareHouseDataContext = _context.Exits.Include(e => e.Inventory)
+                                                    .Include(e => e.Inventory.Product)
+                                                    .Include(e => e.Inventory.WareHouse);
             return View(await wareHouseDataContext.ToListAsync());
         }
 

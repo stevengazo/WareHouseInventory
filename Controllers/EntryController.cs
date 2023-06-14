@@ -22,7 +22,11 @@ namespace Inventario.Controllers
         // GET: Entry
         public async Task<IActionResult> Index()
         {
-            var wareHouseDataContext = _context.Entries.Include(e => e.Inventory);
+            var wareHouseDataContext = _context.Entries
+                .OrderByDescending(E=>E.CreationDate)
+                .Include(e => e.Inventory)
+                .Include(e => e.Inventory.Product)  
+                .Include(e => e.Inventory.WareHouse)  ;
             return View(await wareHouseDataContext.ToListAsync());
         }
 
@@ -36,7 +40,10 @@ namespace Inventario.Controllers
 
             var entry = await _context.Entries
                 .Include(e => e.Inventory)
+                .Include(e => e.Inventory.Product)  
+                .Include(e => e.Inventory.WareHouse)  
                 .FirstOrDefaultAsync(m => m.EntryId == id);
+            
             if (entry == null)
             {
                 return NotFound();

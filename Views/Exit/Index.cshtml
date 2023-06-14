@@ -3,64 +3,79 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "_LayoutAdmin";
+    var Dates = Model.Select(m => m.CreationDate.Date).Distinct().ToList();
+    short contador = 0;
 }
 
-<h1>Index</h1>
+<h1>Historial de Salida de Existencias</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CreationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inventory)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Inventory.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ExistsId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ExistsId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ExistsId">Delete</a>
-            </td>
-        </tr>
+@foreach (var item in Dates)
+{
+    var listExits = Model.Where(E=>E.CreationDate.Date == item).ToList();
+    contador++;
+    string dat = $"collapse{contador.ToString()}";
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#@dat" aria-expanded="true" aria-controls="@dat">
+                    Entradas - @item.Date.ToString("yyyy-MMMM-dd")
+                </button>
+            </h2>
+            <div id="@dat" class="accordion-collapse collapse"
+                aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table class="table table-light">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    Producto
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                                <th>
+                                    Autor
+                                </th>
+                                <th>
+                                    Almacen
+                                </th>
+                                <th>
+                                    Cliente
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                    @foreach (var exit in listExits)
+        {
+            <tr>
+                <td>
+                    @exit.Inventory.Product.Name
+                </td>
+                <td>
+                    @exit.Quantity
+                </td>
+                <td>
+                    @exit.Author
+                </td>
+                <td>
+                    @exit.Inventory.WareHouse.Name
+                </td>
+                                <td>
+                    @exit.CustomerName
+                </td>
+                <td>
+                    <a class="btn btn-outline-info" asp-action="Edit" asp-route-id="@exit.ExistsId">Editar</a> |
+                    <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@exit.ExistsId">Detalles</a>|
+                    <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@exit.ExistsId">Borrar</a>
+                </td>
+            </tr>
+        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
