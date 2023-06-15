@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -60,7 +63,7 @@
             <ul class="navbar-nav flex-grow-2 gap-2 w-75">
               <li class="nav-item">                  
                   <label class="nav-link text-dark d-flex justify-content-between"> 
-                    Hola .....                  
+                    Hola @Accessor.HttpContext.Session.GetString("UserName")                     
                   </label>                 
               </li>
               <li class="nav-item border rounded p-1">
@@ -72,7 +75,7 @@
                 </a>
             </li>
             <li class="nav-item border rounded  p-2 ">
-              <a class="nav-link text-dark d-flex justify-content-between" asp-area="" asp-controller="User" asp-action="Index">
+              <a class="nav-link text-dark d-flex justify-content-between" asp-area="" asp-controller="User" asp-action="Login">
               <label> 
                 Cerrar Sesión
               </label> 

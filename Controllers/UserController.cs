@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.DataBaseContext;
@@ -26,7 +27,7 @@ namespace Inventario.Controllers
             return View(await wareHouseDataContext.ToListAsync());
         }
 
-[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Login()
         {
             return View();
@@ -35,14 +36,30 @@ namespace Inventario.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([Bind("UserName,Password")] User user)
         {
-            string Password = (string.IsNullOrEmpty(user.Password)) ? string.Empty: user.Password;
-            string UserName = (string.IsNullOrEmpty(user.UserName)) ? string.Empty: user.UserName;
-            if(!string.IsNullOrEmpty(Password) && !string.IsNullOrEmpty(UserName)){
-                // do some logic
+            string Password = (string.IsNullOrEmpty(user.Password)) ? string.Empty : user.Password;
+            string UserName = (string.IsNullOrEmpty(user.UserName)) ? string.Empty : user.UserName;
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrEmpty(UserName))
+            {
+                var User = (from U in _context.Users
+                where U.UserName == UserName && U.Password == Password
+                select U).Include(U=>U.GroupsUser).FirstOrDefault();
+                if(User!=null){
+                    User.Password = string.Empty;
+                    HttpContext.Session.SetString("UserName",User.UserName.ToString());                    
+                    HttpContext.Session.SetString("UserType",User.GroupsUser.Level.ToString());                    
+                        // do some logic
+                    return View();
+                }else{
+                    HttpContext.Session.Clear();
+                    return View();
+                }
+                
+            }
+            else
+            {
+                HttpContext.Session.Clear();
                 return View();
-            }else{
-                return View();
-            }            
+            }
         }
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -173,14 +190,14 @@ namespace Inventario.Controllers
             {
                 _context.Users.Remove(user);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
         {
-          return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
+            return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
         }
     }
 }

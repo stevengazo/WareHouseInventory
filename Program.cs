@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Get Connection string from Enviroment or Appsettings
 var stringConnection = Environment.GetEnvironmentVariable("DefaultConnextion");
-stringConnection = (string.IsNullOrEmpty( stringConnection)) ?  stringConnection = builder.Configuration.GetConnectionString("DefaultConnextion") : stringConnection ;
+stringConnection = (string.IsNullOrEmpty(stringConnection)) ? stringConnection = builder.Configuration.GetConnectionString("DefaultConnextion") : stringConnection;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -14,9 +14,12 @@ builder.Services.AddDbContext<WareHouseDataContext>(
     option => option.UseSqlServer(stringConnection)
 );
 
+builder.Services.AddHttpContextAccessor();
 
-
-
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+});
 
 var app = builder.Build();
 
@@ -29,6 +32,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseSession();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
