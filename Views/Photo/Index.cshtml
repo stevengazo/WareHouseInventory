@@ -24,8 +24,8 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.File)
+            <td>               
+                   <img src="@($"Data:image/PNG;base64,{Convert.ToBase64String(item.File)}")" class=" img-fluid object-fit-cover  rounded rounded-1 d-block w-100" alt="..." style="height:5rem">
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Product.Description)
