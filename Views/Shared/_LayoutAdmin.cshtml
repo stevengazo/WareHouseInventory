@@ -61,39 +61,63 @@
 
             </ul>
             <ul class="navbar-nav flex-grow-2 gap-2 w-75">
-              <li class="nav-item">                  
-                  <label class="nav-link text-dark d-flex justify-content-between"> 
-                    Hola @Accessor.HttpContext.Session.GetString("UserName")                     
-                  </label>                 
+
+        @if (!string.IsNullOrEmpty(Accessor.HttpContext.Session.GetString("UserName")))
+        {
+    <li class="nav-item">                  
+                      <label class="nav-link text-dark d-flex justify-content-between"> 
+                        Hola @Accessor.HttpContext.Session.GetString("UserName")                     
+                      </label>                 
+                  </li>
+                     <li class="nav-item border rounded p-1">
+                  <a class="nav-link text-dark d-flex justify-content-between" >
+                  <label> 
+                    Cambiar Contraseña
+                  </label> 
+                  <i class="bi bi-pencil-fill"></i>
+                  </a>
               </li>
-              <li class="nav-item border rounded p-1">
-                <a class="nav-link text-dark d-flex justify-content-between" >
-                <label> 
-                  Cambiar Contraseña
-                </label> 
-                <i class="bi bi-pencil-fill"></i>
-                </a>
-            </li>
-            <li class="nav-item border rounded  p-2 ">
-              <a class="nav-link text-dark d-flex justify-content-between" asp-area="" asp-controller="User" asp-action="Login">
-              <label> 
-                Cerrar Sesión
-              </label> 
-                <i class="bi bi-people-fill"></i>
-              </a>
-          </li>
+
+        }
+
+
+
+
+        @if (string.IsNullOrEmpty(Accessor.HttpContext.Session.GetString("UserName")))
+        {
+         <li class="nav-item border rounded  p-2 ">
+                      <a class="nav-link text-dark d-flex justify-content-between" asp-area="" asp-controller="User" asp-action="Login">
+                      <label> 
+                        Iniciar Sesión
+                      </label> 
+                        <i class="bi bi-people-fill"></i>
+                      </a>
+                  </li>
+        }
+        else
+        {
+                   <li class="nav-item border rounded  p-2 ">
+                      <a class="nav-link text-dark d-flex justify-content-between" asp-area="" asp-controller="User" asp-action="SignOut">
+                      <label> 
+                        Cerrar Sesión
+                      </label> 
+                        <i class="bi bi-people-fill"></i>
+                      </a>
+                  </li>
+        }
+
           </ul>
     </nav>
   </header>
     <section 
-    class="border rounded col-9 p-4">
-      @RenderBody()
+    class="border rounded col-9 p-4 overflow-auto">
+    @RenderBody()
     </section>
-  
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+  @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>

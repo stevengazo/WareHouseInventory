@@ -14,7 +14,7 @@
     var listEntries = Model.Where(E=>E.CreationDate.Date == item).ToList();
     contador++;
     string dat = $"collapse{contador.ToString()}";
-    <div class="accordion" id="accordionExample">
+    <div class="accordion m-1" id="accordionExample">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingOne">
                 <button class="accordion-button" type="button"

@@ -28,6 +28,14 @@ namespace Inventario.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> SignOut()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction(nameof(Login));
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> Login()
         {
             return View();
