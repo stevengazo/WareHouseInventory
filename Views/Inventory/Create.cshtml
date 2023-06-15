@@ -5,29 +5,33 @@
     Layout = "_LayoutAdmin";
 }
 
-<h1>Create</h1>
+<h1>Crear</h1>
 
-<h4>Inventory</h4>
+<h4>Inventario</h4>
+<p>Vincula el producto al almacen donde se va a administrar <br />
+    Solamente se permite registrar 1 vez el producto en el almacen
+</p>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="CreationDate" class="control-label"></label>
-                <input asp-for="CreationDate" class="form-control" />
-                <span asp-validation-for="CreationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="WareHouseId" class="control-label"></label>
-                <select asp-for="WareHouseId" class ="form-control" asp-items="ViewBag.WareHouseId"></select>
+                <select asp-for="WareHouseId" class="form-control"
+                    asp-items="ViewBag.WareHouseId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="ProductId" class="control-label"></label>
-                <select asp-for="ProductId" class ="form-control" asp-items="ViewBag.ProductId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <select asp-for="ProductId" class="form-control"
+                    asp-items="ViewBag.ProductId"></select>
+            </div><div class="d-flex m-1 gap-2 ">
+                <div >
+                    <input type="submit" value="Create" class="btn btn-outline-primary" />
+                </div>
+                <div>
+                    <a class="btn btn-outline-info" asp-action="Index">Lista de Inventarios</a>
+                </div>
             </div>
             <div class="form-group text-danger">
                 @ViewBag.ErrorMessage
@@ -36,10 +40,8 @@
     </div>
 </div>
 
-<div>
-    <a class="btn btn-outline-info m-1" asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -30,7 +30,7 @@ namespace Inventario.Controllers
             }
             else
             {
-              return  View(await _context.Products.ToListAsync());
+              return  View(data);
             }
         }
 

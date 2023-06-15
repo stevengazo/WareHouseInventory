@@ -1,5 +1,6 @@
 @using System;
 @using System.IO;
+@using Models;
 @model IEnumerable<Models.Product>
 
 @{
@@ -14,25 +15,31 @@
     <a class="btn btn-outline-success" asp-action="Create">Registrar Producto</a>
 </p>
 
-
-
 <div class="d-flex flex-wrap gap-2">
-    @foreach (var item in Model)
+    @foreach (Product item in Model)
     {
-    <div class="card" style="width: 18rem;">
-        <img src="..." class="card-img-top w-50 h-0"  alt="...">
-        <div class="card-body">
-            <h5 class="card-title">@item.Name</h5>
-            <p class="card-text"> Precio Venta: $ @item.Sell_Price</p>
-            <p class="card-text"> Precio Compra: $ @item.Buy_Price</p>
-            <p class="card-text">@item.Description</p>
-            <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.ProductId">Detalles</a> 
-            <a class="btn btn-sm btn-outline-success" asp-action="Edit" asp-route-id="@item.ProductId">Editar</a> 
-        </div>              
-    </div>
+        <div class="card" style="width: 18rem;">
+            @if (item.ProductImages.Count > 0)
+            {
+                <img
+                    src="@($"Data:image/PNG;base64,{Convert.ToBase64String(item.ProductImages.First().File)}")"
+                    class=" card-img-top img-fluid img-thumbnail rounded w-100 h-75" alt="..." st />
+            }
+            else
+            {
+                <img src="..." class="class=" card-img-top w-50 h-0" alt="..." />
+            }
+
+            <div class="card-body">
+                <h5 class="card-title">@item.Name</h5>
+                <p class="card-text"> Precio Venta: $ @item.Sell_Price</p>
+                <p class="card-text"> Precio Compra: $ @item.Buy_Price</p>
+                <p class="card-text">@item.Description</p>
+                <a class="btn btn-sm btn-outline-info" asp-action="Details"
+                    asp-route-id="@item.ProductId">Detalles</a>
+                <a class="btn btn-sm btn-outline-success" asp-action="Edit"
+                    asp-route-id="@item.ProductId">Editar</a>
+            </div>
+        </div>
     }
 </div>
-
-
-
-

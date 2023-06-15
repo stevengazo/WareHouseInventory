@@ -35,17 +35,26 @@
                 <input asp-for="Sell_Price" class="form-control" />
                 <span asp-validation-for="Sell_Price" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="d-flex gap-2 m-1">
+                <div>
+                    <input type="submit" value="Save"
+                        class="btn btn-outline-primary" />
+                </div>
+                <div>
+                    <a class="btn btn-outline-info" asp-action="Index">Lista
+                        Productos</a>
+                </div>
+                <div>
+
+                </div>
             </div>
+
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

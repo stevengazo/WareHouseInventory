@@ -15,17 +15,18 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label">Cantidad a Rebajar</label>
-                <label class="control-label">Cantidad disponible: @ViewBag.Inventory.QuantityOfExistances</label>
+                <label class="control-label">Cantidad disponible:
+                    @ViewBag.Inventory.QuantityOfExistances</label>
                 <input asp-for="Quantity" class="form-control" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label  class="control-label">Autor</label>
+                <label class="control-label">Autor</label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label  class="control-label">Nombre Del Ciente</label>
+                <label class="control-label">Nombre Del Ciente</label>
                 <input asp-for="CustomerName" class="form-control" />
                 <span asp-validation-for="CustomerName" class="text-danger"></span>
             </div>
@@ -35,11 +36,18 @@
                 <span asp-validation-for="Notes" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Producto N°</label>        
-                <input asp-for="InventoryId" class ="form-control" value="@ViewBag.Inventory.InventoryId" readonly/>
+                <label class="control-label">Producto N°</label>
+                <input asp-for="InventoryId" class="form-control"
+                    value="@ViewBag.Inventory.InventoryId" readonly />
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="d-flex m-1 gap-2">
+                <div>
+                    <input type="submit" value="Create"
+                        class="btn btn-outline-primary" />
+                </div>
+                <div>
+                    <a class="btn btn-outline-info" asp-action="Index">Cancelar</a>
+                </div>
             </div>
         </form>
     </div>
@@ -48,10 +56,9 @@
 <label class="text-danger">
     @ViewBag.Error
 </label>
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
