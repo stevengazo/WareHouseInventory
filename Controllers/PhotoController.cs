@@ -46,82 +46,51 @@ namespace Inventario.Controllers
         }
 
         // GET: Photo/Create
-        public IActionResult Create()
+        public IActionResult Create(string id = "1")
         {
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description");
+            ViewBag.ProductId = id;
             return View();
         }
 
+    
+        private byte[] ToByteArray(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (var ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
         // POST: Photo/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PhotoId,File,ProductId")] Photo photo)
+        public async Task<IActionResult> Create(IFormFile data, string ProductId)
         {
-            if (ModelState.IsValid)
+            if (data != null && !string.IsNullOrEmpty(ProductId))
             {
-                _context.Add(photo);
+                Photo tmp = new Photo();
+                tmp.ProductId = Convert.ToInt32(ProductId);
+                using (var stream = data.OpenReadStream())
+                {
+                    tmp.File = ToByteArray(stream);
+                }
+                tmp.FileName = data.FileName;                
+                _context.Photos.Add(tmp);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", photo.ProductId);
-            return View(photo);
+            ViewBag.ProductId = ProductId;
+            return View();
         }
 
-        // GET: Photo/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Photos == null)
-            {
-                return NotFound();
-            }
-
-            var photo = await _context.Photos.FindAsync(id);
-            if (photo == null)
-            {
-                return NotFound();
-            }
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", photo.ProductId);
-            return View(photo);
-        }
-
-        // POST: Photo/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PhotoId,File,ProductId")] Photo photo)
-        {
-            if (id != photo.PhotoId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(photo);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PhotoExists(photo.PhotoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", photo.ProductId);
-            return View(photo);
-        }
-
+    
         // GET: Photo/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -155,14 +124,14 @@ namespace Inventario.Controllers
             {
                 _context.Photos.Remove(photo);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PhotoExists(int id)
         {
-          return (_context.Photos?.Any(e => e.PhotoId == id)).GetValueOrDefault();
+            return (_context.Photos?.Any(e => e.PhotoId == id)).GetValueOrDefault();
         }
     }
 }

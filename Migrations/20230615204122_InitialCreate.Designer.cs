@@ -12,7 +12,7 @@ using Models.DataBaseContext;
 namespace Inventario.Migrations
 {
     [DbContext(typeof(WareHouseDataContext))]
-    [Migration("20230615181558_InitialCreate")]
+    [Migration("20230615204122_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -179,6 +179,10 @@ namespace Inventario.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -275,7 +279,7 @@ namespace Inventario.Migrations
                             UserId = 1,
                             Enable = true,
                             GroupsUserId = 1,
-                            LastLogin = new DateTime(2023, 6, 15, 12, 15, 57, 877, DateTimeKind.Local).AddTicks(907),
+                            LastLogin = new DateTime(2023, 6, 15, 14, 41, 21, 371, DateTimeKind.Local).AddTicks(9193),
                             LastName = "",
                             Name = "",
                             Password = "admin",

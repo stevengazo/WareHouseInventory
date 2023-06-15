@@ -90,6 +90,7 @@ namespace Inventario.Migrations
                 {
                     PhotoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     File = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -198,7 +199,7 @@ namespace Inventario.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Enable", "GroupsUserId", "LastLogin", "LastName", "Name", "Password", "UserImagePath", "UserName" },
-                values: new object[] { 1, true, 1, new DateTime(2023, 6, 15, 12, 15, 57, 877, DateTimeKind.Local).AddTicks(907), "", "", "admin", null, "admin" });
+                values: new object[] { 1, true, 1, new DateTime(2023, 6, 15, 14, 41, 21, 371, DateTimeKind.Local).AddTicks(9193), "", "", "admin", null, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entries_InventoryId",

@@ -43,7 +43,7 @@
 <div>
   <a class="btn btn-outline-info" asp-action="Edit" asp-route-id="@Model?.ProductId">Editar</a> |
    <a class="btn btn-outline-info" asp-action="Index">Volver a la lista</a> |
-    <a asp-controller="Photo" asp-action="CreateByProduct" asp-route-id="@Model.ProductId">Fotografia</a> |
+    <a asp-controller="Photo" asp-action="Create" asp-route-id="@Model.ProductId">Fotografia</a> |
 </div>
 <h1>Almacenes</h1>
 @foreach (WareHouse item in @ViewBag.WareHouses)
