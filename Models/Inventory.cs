@@ -5,9 +5,6 @@ public class Inventory
 {
     [Key]
     public int InventoryId { get; set; }
-    [Required]
-    [MaxLength(50)]
-    public string? Name {get;set;}
     public DateTime CreationDate { get; set; }
     public int QuantityOfExistances {get;set;}
     public WareHouse? WareHouse {get;set;}

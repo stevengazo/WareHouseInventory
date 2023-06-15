@@ -17,7 +17,7 @@ namespace Inventario.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -146,11 +146,6 @@ namespace Inventario.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -177,8 +172,9 @@ namespace Inventario.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PhotoId"));
 
-                    b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("File")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -188,14 +184,6 @@ namespace Inventario.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Photos");
-
-                    b.HasData(
-                        new
-                        {
-                            PhotoId = 1,
-                            FilePath = "./photos/default.png",
-                            ProductId = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -284,7 +272,7 @@ namespace Inventario.Migrations
                             UserId = 1,
                             Enable = true,
                             GroupsUserId = 1,
-                            LastLogin = new DateTime(2023, 6, 9, 19, 14, 2, 553, DateTimeKind.Local).AddTicks(2211),
+                            LastLogin = new DateTime(2023, 6, 15, 12, 15, 57, 877, DateTimeKind.Local).AddTicks(907),
                             LastName = "",
                             Name = "",
                             Password = "admin",

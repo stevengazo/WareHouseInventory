@@ -59,14 +59,8 @@ namespace Models.DataBaseContext
                 Buy_Price = 1,
                 Sell_Price = 2
             };
-
-            Photo defaultphoto = new() {
-                PhotoId = 1,
-                FilePath= "./photos/default.png",
-                ProductId = defaultProduct.ProductId
-            };
+;
             modelBuilder.Entity<Product>().HasData(defaultProduct);
-            modelBuilder.Entity<Photo>().HasData(defaultphoto);
             modelBuilder.Entity<Group>().HasData(Admins);
             modelBuilder.Entity<Group>().HasData(Seller);
             modelBuilder.Entity<Group>().HasData(Managers);

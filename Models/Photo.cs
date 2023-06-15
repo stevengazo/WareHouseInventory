@@ -7,7 +7,8 @@ public class Photo
     [Key]
     [Required]
     public int PhotoId { get; set; }
-    public string? FilePath {get;set; }
+    [Required]
+    public byte[] File {get;set; }
     public Product? Product {get;set;}
     public int ProductId { get; set; }
     

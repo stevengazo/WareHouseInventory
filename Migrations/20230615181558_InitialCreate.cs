@@ -90,7 +90,7 @@ namespace Inventario.Migrations
                 {
                     PhotoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    File = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -110,7 +110,6 @@ namespace Inventario.Migrations
                 {
                     InventoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     QuantityOfExistances = table.Column<int>(type: "int", nullable: false),
                     WareHouseId = table.Column<int>(type: "int", nullable: false),
@@ -197,14 +196,9 @@ namespace Inventario.Migrations
                 values: new object[] { 1, 1.0, "Sample", "Sample", 2.0 });
 
             migrationBuilder.InsertData(
-                table: "Photos",
-                columns: new[] { "PhotoId", "FilePath", "ProductId" },
-                values: new object[] { 1, "./photos/default.png", 1 });
-
-            migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Enable", "GroupsUserId", "LastLogin", "LastName", "Name", "Password", "UserImagePath", "UserName" },
-                values: new object[] { 1, true, 1, new DateTime(2023, 6, 9, 19, 14, 2, 553, DateTimeKind.Local).AddTicks(2211), "", "", "admin", null, "admin" });
+                values: new object[] { 1, true, 1, new DateTime(2023, 6, 15, 12, 15, 57, 877, DateTimeKind.Local).AddTicks(907), "", "", "admin", null, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entries_InventoryId",

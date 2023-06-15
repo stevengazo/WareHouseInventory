@@ -94,7 +94,7 @@ namespace Inventario.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InventoryId,Name,CreationDate,WareHouseId,ProductId")] Inventory inventory)
+        public async Task<IActionResult> Create([Bind("InventoryId,CreationDate,WareHouseId,ProductId")] Inventory inventory)
         {
             if (ModelState.IsValid)
             {
@@ -143,7 +143,7 @@ namespace Inventario.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InventoryId,Name,CreationDate,QuantityOfExistances,WareHouseId,ProductId")] Inventory inventory)
+        public async Task<IActionResult> Edit(int id, [Bind("InventoryId,CreationDate,QuantityOfExistances,WareHouseId,ProductId")] Inventory inventory)
         {
             if (id != inventory.InventoryId)
             {
