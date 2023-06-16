@@ -22,8 +22,15 @@ namespace Inventario.Controllers
         // GET: Inventory
         public async Task<IActionResult> Index()
         {
-            var wareHouseDataContext = _context.Inventories.Include(i => i.Product).Include(i => i.WareHouse);
-            return View(await wareHouseDataContext.ToListAsync());
+            if ( LoginChecker())
+            {
+                var wareHouseDataContext = _context.Inventories.Include(i => i.Product).Include(i => i.WareHouse);
+                return View(await wareHouseDataContext.ToListAsync());
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
 
@@ -85,7 +92,7 @@ namespace Inventario.Controllers
         {
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description");
             ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address");
-            ViewBag.ErrorMessage="";
+            ViewBag.ErrorMessage = "";
             return View();
         }
 
@@ -116,7 +123,7 @@ namespace Inventario.Controllers
             }
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Description", inventory.ProductId);
             ViewData["WareHouseId"] = new SelectList(_context.WareHouses, "WareHouseId", "Address", inventory.WareHouseId);
-            ViewBag.ErrorMessage= "";
+            ViewBag.ErrorMessage = "";
             return View(inventory);
         }
 
@@ -217,6 +224,36 @@ namespace Inventario.Controllers
         private bool InventoryExists(int id)
         {
             return (_context.Inventories?.Any(e => e.InventoryId == id)).GetValueOrDefault();
+        }
+
+        private bool LoginChecker(){
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0 )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }  
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0 )
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > userle )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

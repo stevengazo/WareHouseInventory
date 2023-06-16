@@ -22,9 +22,9 @@ namespace Inventario.Controllers
         // GET: WareHouse
         public async Task<IActionResult> Index()
         {
-              return _context.WareHouses != null ? 
-                          View(await _context.WareHouses.ToListAsync()) :
-                          Problem("Entity set 'WareHouseDataContext.WareHouses'  is null.");
+            return _context.WareHouses != null ?
+                        View(await _context.WareHouses.ToListAsync()) :
+                        Problem("Entity set 'WareHouseDataContext.WareHouses'  is null.");
         }
 
         // GET: WareHouse/Details/5
@@ -39,12 +39,14 @@ namespace Inventario.Controllers
             if (wareHouse == null)
             {
                 return NotFound();
-            }else{
-            wareHouse.Inventories = await (from I in _context.Inventories 
-                                                where I.WareHouseId == wareHouse.WareHouseId
-                                                select I
-                                                ).Include(I=>I.Product).ToListAsync();
-            return View(wareHouse);
+            }
+            else
+            {
+                wareHouse.Inventories = await (from I in _context.Inventories
+                                               where I.WareHouseId == wareHouse.WareHouseId
+                                               select I
+                                                    ).Include(I => I.Product).ToListAsync();
+                return View(wareHouse);
             }
         }
 
@@ -73,17 +75,25 @@ namespace Inventario.Controllers
         // GET: WareHouse/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.WareHouses == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
             {
-                return NotFound();
+                if (id == null || _context.WareHouses == null)
+                {
+                    return NotFound();
+                }
+
+                var wareHouse = await _context.WareHouses.FindAsync(id);
+                if (wareHouse == null)
+                {
+                    return NotFound();
+                }
+                return View(wareHouse);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            var wareHouse = await _context.WareHouses.FindAsync(id);
-            if (wareHouse == null)
-            {
-                return NotFound();
-            }
-            return View(wareHouse);
         }
 
         // POST: WareHouse/Edit/5
@@ -93,50 +103,62 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("WareHouseId,Name,Address")] WareHouse wareHouse)
         {
-            if (id != wareHouse.WareHouseId)
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
             {
-                return NotFound();
-            }
+                if (id != wareHouse.WareHouseId)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(wareHouse);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!WareHouseExists(wareHouse.WareHouseId))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(wareHouse);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!WareHouseExists(wareHouse.WareHouseId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                return View(wareHouse);
             }
-            return View(wareHouse);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // GET: WareHouse/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.WareHouses == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
-            }
-
-            var wareHouse = await _context.WareHouses
+                var wareHouse = await _context.WareHouses
                 .FirstOrDefaultAsync(m => m.WareHouseId == id);
-            if (wareHouse == null)
-            {
-                return NotFound();
+                if (wareHouse == null)
+                {
+                    return NotFound();
+                }
+                return View(wareHouse);
             }
-
-            return View(wareHouse);
+            else
+            {
+                return RedirectToAction("Login", "User");
+                if (id == null || _context.WareHouses == null)
+                {
+                    return NotFound();
+                }
+            }
         }
 
         // POST: WareHouse/Delete/5
@@ -144,23 +166,61 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.WareHouses == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return Problem("Entity set 'WareHouseDataContext.WareHouses'  is null.");
+                if (_context.WareHouses == null)
+                {
+                    return Problem("Entity set 'WareHouseDataContext.WareHouses'  is null.");
+                }
+                var wareHouse = await _context.WareHouses.FindAsync(id);
+                if (wareHouse != null)
+                {
+                    _context.WareHouses.Remove(wareHouse);
+                }
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            var wareHouse = await _context.WareHouses.FindAsync(id);
-            if (wareHouse != null)
+            else
             {
-                _context.WareHouses.Remove(wareHouse);
+                return RedirectToAction("Login", "User");
+
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool WareHouseExists(int id)
         {
-          return (_context.WareHouses?.Any(e => e.WareHouseId == id)).GetValueOrDefault();
+            return (_context.WareHouses?.Any(e => e.WareHouseId == id)).GetValueOrDefault();
+        }
+
+        private bool LoginChecker()
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0)
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level <= userle)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

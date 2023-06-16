@@ -13,10 +13,10 @@ public class Validations
         _context = Context;
     }
 
-    public bool IsUserValid(int idUser)
+    public bool IsUserValid(short idUser)
     {
         try
-        {
+        {        
             var query = (from U in _context.Users
                          where U.Enable && U.UserId == idUser
                          select U

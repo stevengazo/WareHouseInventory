@@ -23,8 +23,15 @@ namespace Inventario.Controllers
         // GET: User
         public async Task<IActionResult> Index()
         {
-            var wareHouseDataContext = _context.Users.Include(u => u.GroupsUser);
-            return View(await wareHouseDataContext.ToListAsync());
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
+            {
+                var wareHouseDataContext = _context.Users.Include(u => u.GroupsUser);
+                return View(await wareHouseDataContext.ToListAsync());
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         [HttpGet]
@@ -49,19 +56,22 @@ namespace Inventario.Controllers
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrEmpty(UserName))
             {
                 var User = (from U in _context.Users
-                where U.UserName == UserName && U.Password == Password
-                select U).Include(U=>U.GroupsUser).FirstOrDefault();
-                if(User!=null){
+                            where U.UserName == UserName && U.Password == Password
+                            select U).Include(U => U.GroupsUser).FirstOrDefault();
+                if (User != null)
+                {
                     User.Password = string.Empty;
-                    HttpContext.Session.SetString("UserName",User.UserName.ToString());                    
-                    HttpContext.Session.SetString("UserType",User.GroupsUser.Level.ToString());                    
-                        // do some logic
+                    HttpContext.Session.SetString("UserName", User.UserName.ToString());
+                    HttpContext.Session.SetString("UserLevel", User.GroupsUser.Level.ToString());
+                    // do some logic
                     return View();
-                }else{
+                }
+                else
+                {
                     HttpContext.Session.Clear();
                     return View();
                 }
-                
+
             }
             else
             {
@@ -72,27 +82,41 @@ namespace Inventario.Controllers
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Users == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
+                if (id == null || _context.Users == null)
+                {
+                    return NotFound();
+                }
+                var user = await _context.Users
+                    .Include(u => u.GroupsUser)
+                    .FirstOrDefaultAsync(m => m.UserId == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            var user = await _context.Users
-                .Include(u => u.GroupsUser)
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
 
-            return View(user);
         }
 
         // GET: User/Create
         public IActionResult Create()
         {
-            ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId");
-            return View();
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
+            {
+                ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId");
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // POST: User/Create
@@ -115,18 +139,24 @@ namespace Inventario.Controllers
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Users == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
+                if (id == null || _context.Users == null)
+                {
+                    return NotFound();
+                }
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId", user.GroupsUserId);
+                return View(user);
             }
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            else
             {
-                return NotFound();
+                return RedirectToAction("Login", "User");
             }
-            ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId", user.GroupsUserId);
-            return View(user);
         }
 
         // POST: User/Edit/5
@@ -136,33 +166,43 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,UserName,Name,LastName,Password,UserImagePath,Enable,LastLogin,GroupsUserId")] User user)
         {
-            if (id != user.UserId)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
+                if (id != user.UserId)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(user);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!UserExists(user.UserId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId", user.GroupsUserId);
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.UserId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GroupsUserId"] = new SelectList(_context.Groups, "GroupsUserId", "GroupsUserId", user.GroupsUserId);
-            return View(user);
+
+
         }
 
         // GET: User/Delete/5
@@ -206,6 +246,38 @@ namespace Inventario.Controllers
         private bool UserExists(int id)
         {
             return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
+        }
+
+
+        private bool LoginChecker()
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0)
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level <= userle)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

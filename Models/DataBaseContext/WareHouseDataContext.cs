@@ -32,7 +32,7 @@ namespace Models.DataBaseContext
                 GroupsUserId = 2,
                 Name = "Vendedores",
                 Status = true,
-                Level = 2
+                Level = 3
             };
             Group Managers = new()
             {
