@@ -23,10 +23,10 @@ namespace Inventario.Controllers
         public async Task<IActionResult> Index()
         {
             var wareHouseDataContext = _context.Entries
-                .OrderByDescending(E=>E.CreationDate)
+                .OrderByDescending(E => E.CreationDate)
                 .Include(e => e.Inventory)
-                .Include(e => e.Inventory.Product)  
-                .Include(e => e.Inventory.WareHouse)  ;
+                .Include(e => e.Inventory.Product)
+                .Include(e => e.Inventory.WareHouse);
             return View(await wareHouseDataContext.ToListAsync());
         }
 
@@ -40,10 +40,10 @@ namespace Inventario.Controllers
 
             var entry = await _context.Entries
                 .Include(e => e.Inventory)
-                .Include(e => e.Inventory.Product)  
-                .Include(e => e.Inventory.WareHouse)  
+                .Include(e => e.Inventory.Product)
+                .Include(e => e.Inventory.WareHouse)
                 .FirstOrDefaultAsync(m => m.EntryId == id);
-            
+
             if (entry == null)
             {
                 return NotFound();
@@ -53,10 +53,18 @@ namespace Inventario.Controllers
         }
 
         // GET: Entry/Create
-        public async Task< IActionResult> Createbyinventory(string id)
+        public async Task<IActionResult> Createbyinventory(string id)
         {
-            ViewBag.Inventory = await _context.Inventories.Where(I=>I.InventoryId == Convert.ToInt32(id)).FirstOrDefaultAsync();
-            return View();
+
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
+            {
+                ViewBag.Inventory = await _context.Inventories.Where(I => I.InventoryId == Convert.ToInt32(id)).FirstOrDefaultAsync();
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
 
@@ -67,18 +75,28 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Createbyinventory([Bind("EntryId,Quantity,LoteCode,Author,Notes,InventoryId")] Entry entry)
         {
-            if (ModelState.IsValid)
+
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
             {
-                entry.CreationDate = DateTime.Now;
-                Inventory tmp = _context.Inventories.Where(I=>I.InventoryId == entry.InventoryId).FirstOrDefault();
-                tmp.QuantityOfExistances = tmp.QuantityOfExistances + entry.Quantity;
-                _context.Inventories.Update(tmp);
-                _context.Add(entry);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    entry.CreationDate = DateTime.Now;
+                    Inventory tmp = _context.Inventories.Where(I => I.InventoryId == entry.InventoryId).FirstOrDefault();
+                    tmp.QuantityOfExistances = tmp.QuantityOfExistances + entry.Quantity;
+                    _context.Inventories.Update(tmp);
+                    _context.Add(entry);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", entry.InventoryId);
+                return View(entry);
             }
-            ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", entry.InventoryId);
-            return View(entry);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+
         }
 
 
@@ -131,35 +149,76 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EntryId,CreationDate,Quantity,LoteCode,Author,Notes,InventoryId")] Entry entry)
         {
-            if (id != entry.EntryId)
+
+
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
+                if (id != entry.EntryId)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(entry);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!EntryExists(entry.EntryId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", entry.InventoryId);
+                return View(entry);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(entry);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EntryExists(entry.EntryId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", entry.InventoryId);
-            return View(entry);
         }
 
+
+        private bool LoginChecker()
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0)
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level <= userle)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         // GET: Entry/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -193,14 +252,14 @@ namespace Inventario.Controllers
             {
                 _context.Entries.Remove(entry);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool EntryExists(int id)
         {
-          return (_context.Entries?.Any(e => e.EntryId == id)).GetValueOrDefault();
+            return (_context.Entries?.Any(e => e.EntryId == id)).GetValueOrDefault();
         }
     }
 }

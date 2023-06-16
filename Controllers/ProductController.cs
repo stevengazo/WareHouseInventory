@@ -23,43 +23,90 @@ namespace Inventario.Controllers
         public async Task<IActionResult> Index()
         {
             var data = (from P in _context.Products
-                        select P).Include(P=>P.ProductImages).ToList();
+                        select P).Include(P => P.ProductImages).ToList();
             if (data == null)
             {
                 return Problem("Entity set 'WareHouseDataContext.Products'  is null.");
             }
             else
             {
-              return  View(data);
+                return View(data);
             }
         }
 
         // GET: Product/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Products == null)
+
+            if (LoginChecker() && CheckUserType(IUserLevels.SellerLevel))
             {
-                return NotFound();
+                if (id == null || _context.Products == null)
+                {
+                    return NotFound();
+                }
+
+                var product = await _context.Products.Include(P => P.ProductImages)
+                    .FirstOrDefaultAsync(m => m.ProductId == id);
+                var inventories = await (from i in _context.Inventories where i.ProductId == product.ProductId select i).Include(i => i.WareHouse).ToListAsync();
+                ViewBag.Inventory = inventories;
+                ViewBag.WareHouses = (from i in inventories select i.WareHouse).Distinct().ToList();
+
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                return View(product);
             }
-
-            var product = await _context.Products.Include(P => P.ProductImages)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            var inventories = await (from i in _context.Inventories where i.ProductId == product.ProductId select i).Include(i => i.WareHouse).ToListAsync();
-            ViewBag.Inventory = inventories;
-            ViewBag.WareHouses = (from i in inventories select i.WareHouse).Distinct().ToList();
-
-            if (product == null)
+            else
             {
-                return NotFound();
+                return RedirectToAction("Login", "User");
             }
-
-            return View(product);
         }
 
         // GET: Product/Create
         public IActionResult Create()
         {
-            return View();
+            if (LoginChecker() && CheckUserType(IUserLevels.SellerLevel))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
+
+
+        private bool LoginChecker()
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0)
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level <= userle)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // POST: Product/Create
@@ -69,29 +116,48 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductId,Name,Description,Buy_Price,Sell_Price")] Product product)
         {
-            if (ModelState.IsValid)
-            {                                
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+            if (LoginChecker() && CheckUserType(IUserLevels.SellerLevel))
+            {
+                if (ModelState.IsValid)
+                {
+                    _context.Add(product);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(product);
             }
-            return View(product);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+
         }
 
         // GET: Product/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Products == null)
+
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
             {
-                return NotFound();
+
+                if (id == null || _context.Products == null)
+                {
+                    return NotFound();
+                }
+
+                var product = await _context.Products.FindAsync(id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return View(product);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product);
         }
 
         // POST: Product/Edit/5
@@ -101,50 +167,69 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductId,Name,Description,Buy_Price,Sell_Price")] Product product)
         {
-            if (id != product.ProductId)
+
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
             {
-                return NotFound();
+                if (id != product.ProductId)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(product);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!ProductExists(product.ProductId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(product);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.ProductId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(product);
+
         }
 
         // GET: Product/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Products == null)
+            if (LoginChecker() && CheckUserType(IUserLevels.AdminLevel))
             {
-                return NotFound();
+                if (id == null || _context.Products == null)
+                {
+                    return NotFound();
+                }
+
+                var product = await _context.Products
+                    .FirstOrDefaultAsync(m => m.ProductId == id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                return View(product);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
 
-            return View(product);
         }
 
         // POST: Product/Delete/5

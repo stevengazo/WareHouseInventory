@@ -1,4 +1,6 @@
 @model Models.Exit
+@inject IHttpContextAccessor Accessor
+
 
 @{
     ViewData["Title"] = "Create";
@@ -22,7 +24,7 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Autor</label>
-                <input asp-for="Author" class="form-control" />
+                <input asp-for="Author" class="form-control" value="@Accessor.HttpContext.Session.GetString("UserName")" readonly />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
             <div class="form-group">

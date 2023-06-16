@@ -21,7 +21,7 @@ namespace Inventario.Controllers
 
         // GET: Exit
         public async Task<IActionResult> Index()
-        {            
+        {
             var wareHouseDataContext = _context.Exits.Include(e => e.Inventory)
                                                     .Include(e => e.Inventory.Product)
                                                     .Include(e => e.Inventory.WareHouse);
@@ -50,11 +50,51 @@ namespace Inventario.Controllers
         // GET: Exit/Create
         public async Task<IActionResult> CreatebyInventory(string id)
         {
-            var tmp = await _context.Inventories.Where(I=>I.InventoryId == Convert.ToInt32(id) ).FirstOrDefaultAsync();           
-            ViewBag.Inventory = tmp;
-            ViewBag.Error= string.Empty;
-            return View();
+
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
+            {
+                var tmp = await _context.Inventories.Where(I => I.InventoryId == Convert.ToInt32(id)).FirstOrDefaultAsync();
+                ViewBag.Inventory = tmp;
+                ViewBag.Error = string.Empty;
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
+
+        private bool LoginChecker()
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Check if the user has a level type 
+        /// </summary>
+        /// <returns>true if the user can see the element</returns>
+        private bool CheckUserType(short userle = 0)
+        {
+            short level = Convert.ToInt16(HttpContext.Session.GetString("UserLevel"));
+            if (level <= userle)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         // POST: Exit/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -62,26 +102,37 @@ namespace Inventario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatebyInventory([Bind("ExistsId,Quantity,Author,CustomerName,Notes,InventoryId")] Exit exit)
         {
-            if (ModelState.IsValid)
-            {
-                exit.CreationDate = DateTime.Now;
-                Inventory temp = await _context.Inventories.Where(I=>I.InventoryId == exit.InventoryId ).FirstOrDefaultAsync();           
-                bool QuantityValid = ((temp.QuantityOfExistances - exit.Quantity ) >=0)  ? true : false;
-                if(QuantityValid){
-                    temp.QuantityOfExistances = temp.QuantityOfExistances - exit.Quantity;
-                    _context.Inventories.Update(temp);
-                    _context.Add(exit);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }else{
 
-                    ViewBag.Inventory = temp;
-                    ViewBag.Error= "La Cantidad excede las existencias";
-                    return View();
-                }                
+            if (LoginChecker() && CheckUserType(IUserLevels.ManagerLevel))
+            {
+                if (ModelState.IsValid)
+                {
+                    exit.CreationDate = DateTime.Now;
+                    Inventory temp = await _context.Inventories.Where(I => I.InventoryId == exit.InventoryId).FirstOrDefaultAsync();
+                    bool QuantityValid = ((temp.QuantityOfExistances - exit.Quantity) >= 0) ? true : false;
+                    if (QuantityValid)
+                    {
+                        temp.QuantityOfExistances = temp.QuantityOfExistances - exit.Quantity;
+                        _context.Inventories.Update(temp);
+                        _context.Add(exit);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+
+                        ViewBag.Inventory = temp;
+                        ViewBag.Error = "La Cantidad excede las existencias";
+                        return View();
+                    }
+                }
+                ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", exit.InventoryId);
+                return View(exit);
             }
-            ViewData["InventoryId"] = new SelectList(_context.Inventories, "InventoryId", "Name", exit.InventoryId);
-            return View(exit);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // GET: Exit/Create
@@ -194,14 +245,14 @@ namespace Inventario.Controllers
             {
                 _context.Exits.Remove(exit);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ExitExists(int id)
         {
-          return (_context.Exits?.Any(e => e.ExistsId == id)).GetValueOrDefault();
+            return (_context.Exits?.Any(e => e.ExistsId == id)).GetValueOrDefault();
         }
     }
 }
