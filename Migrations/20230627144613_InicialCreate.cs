@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Inventario.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InicialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,6 +26,23 @@ namespace Inventario.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Groups", x => x.GroupsUserId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Produc",
+                columns: table => new
+                {
+                    ProductCodeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GenerationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CanExpire = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Produc", x => x.ProductCodeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -141,10 +158,12 @@ namespace Inventario.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    LoteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Discounts = table.Column<int>(type: "int", nullable: false),
+                    Avariable = table.Column<bool>(type: "bit", nullable: false),
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InventoryId = table.Column<int>(type: "int", nullable: false)
+                    InventoryId = table.Column<int>(type: "int", nullable: false),
+                    ProductCodeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,6 +173,12 @@ namespace Inventario.Migrations
                         column: x => x.InventoryId,
                         principalTable: "Inventories",
                         principalColumn: "InventoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Entries_Produc_ProductCodeId",
+                        column: x => x.ProductCodeId,
+                        principalTable: "Produc",
+                        principalColumn: "ProductCodeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -181,13 +206,42 @@ namespace Inventario.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RegisterOfExits",
+                columns: table => new
+                {
+                    RegisterOfExitId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    MyProperty = table.Column<int>(type: "int", nullable: false),
+                    ProductCodeId = table.Column<int>(type: "int", nullable: false),
+                    ExistsId = table.Column<int>(type: "int", nullable: false),
+                    ExitExistsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegisterOfExits", x => x.RegisterOfExitId);
+                    table.ForeignKey(
+                        name: "FK_RegisterOfExits_Exits_ExitExistsId",
+                        column: x => x.ExitExistsId,
+                        principalTable: "Exits",
+                        principalColumn: "ExistsId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RegisterOfExits_Produc_ProductCodeId",
+                        column: x => x.ProductCodeId,
+                        principalTable: "Produc",
+                        principalColumn: "ProductCodeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Groups",
                 columns: new[] { "GroupsUserId", "Level", "Name", "Status" },
                 values: new object[,]
                 {
                     { 1, 1, "Administradores", true },
-                    { 2, 2, "Vendedores", true },
+                    { 2, 3, "Vendedores", true },
                     { 3, 2, "Administrador Inventarios", true }
                 });
 
@@ -199,12 +253,17 @@ namespace Inventario.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Enable", "GroupsUserId", "LastLogin", "LastName", "Name", "Password", "UserImagePath", "UserName" },
-                values: new object[] { 1, true, 1, new DateTime(2023, 6, 15, 14, 41, 21, 371, DateTimeKind.Local).AddTicks(9193), "", "", "admin", null, "admin" });
+                values: new object[] { 1, true, 1, new DateTime(2023, 6, 27, 8, 46, 12, 955, DateTimeKind.Local).AddTicks(4083), "", "", "admin", null, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entries_InventoryId",
                 table: "Entries",
                 column: "InventoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Entries_ProductCodeId",
+                table: "Entries",
+                column: "ProductCodeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exits_InventoryId",
@@ -227,6 +286,16 @@ namespace Inventario.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RegisterOfExits_ExitExistsId",
+                table: "RegisterOfExits",
+                column: "ExitExistsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RegisterOfExits_ProductCodeId",
+                table: "RegisterOfExits",
+                column: "ProductCodeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_GroupsUserId",
                 table: "Users",
                 column: "GroupsUserId");
@@ -239,19 +308,25 @@ namespace Inventario.Migrations
                 name: "Entries");
 
             migrationBuilder.DropTable(
-                name: "Exits");
+                name: "Photos");
 
             migrationBuilder.DropTable(
-                name: "Photos");
+                name: "RegisterOfExits");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Inventories");
+                name: "Exits");
+
+            migrationBuilder.DropTable(
+                name: "Produc");
 
             migrationBuilder.DropTable(
                 name: "Groups");
+
+            migrationBuilder.DropTable(
+                name: "Inventories");
 
             migrationBuilder.DropTable(
                 name: "Products");

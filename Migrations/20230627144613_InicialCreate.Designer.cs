@@ -12,8 +12,8 @@ using Models.DataBaseContext;
 namespace Inventario.Migrations
 {
     [DbContext(typeof(WareHouseDataContext))]
-    [Migration("20230615204122_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230627144613_InicialCreate")]
+    partial class InicialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,17 +36,23 @@ namespace Inventario.Migrations
                     b.Property<string>("Author")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Avariable")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Discounts")
+                        .HasColumnType("int");
 
                     b.Property<int>("InventoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LoteCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductCodeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -54,6 +60,8 @@ namespace Inventario.Migrations
                     b.HasKey("EntryId");
 
                     b.HasIndex("InventoryId");
+
+                    b.HasIndex("ProductCodeId");
 
                     b.ToTable("Entries");
                 });
@@ -125,7 +133,7 @@ namespace Inventario.Migrations
                         new
                         {
                             GroupsUserId = 2,
-                            Level = 2,
+                            Level = 3,
                             Name = "Vendedores",
                             Status = true
                         },
@@ -232,6 +240,66 @@ namespace Inventario.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Models.ProductCode", b =>
+                {
+                    b.Property<int>("ProductCodeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductCodeId"));
+
+                    b.Property<bool>("CanExpire")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Code")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GenerationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ProductCodeId");
+
+                    b.ToTable("Produc");
+                });
+
+            modelBuilder.Entity("Models.RegisterOfExit", b =>
+                {
+                    b.Property<int>("RegisterOfExitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegisterOfExitId"));
+
+                    b.Property<int>("ExistsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExitExistsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MyProperty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("RegisterOfExitId");
+
+                    b.HasIndex("ExitExistsId");
+
+                    b.HasIndex("ProductCodeId");
+
+                    b.ToTable("RegisterOfExits");
+                });
+
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -279,7 +347,7 @@ namespace Inventario.Migrations
                             UserId = 1,
                             Enable = true,
                             GroupsUserId = 1,
-                            LastLogin = new DateTime(2023, 6, 15, 14, 41, 21, 371, DateTimeKind.Local).AddTicks(9193),
+                            LastLogin = new DateTime(2023, 6, 27, 8, 46, 12, 955, DateTimeKind.Local).AddTicks(4083),
                             LastName = "",
                             Name = "",
                             Password = "admin",
@@ -318,7 +386,15 @@ namespace Inventario.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Models.ProductCode", "ProductCode")
+                        .WithMany("Entries")
+                        .HasForeignKey("ProductCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Inventory");
+
+                    b.Navigation("ProductCode");
                 });
 
             modelBuilder.Entity("Models.Exit", b =>
@@ -362,6 +438,25 @@ namespace Inventario.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Models.RegisterOfExit", b =>
+                {
+                    b.HasOne("Models.Exit", "Exit")
+                        .WithMany()
+                        .HasForeignKey("ExitExistsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.ProductCode", "ProductCode")
+                        .WithMany("RegisterOfExits")
+                        .HasForeignKey("ProductCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exit");
+
+                    b.Navigation("ProductCode");
+                });
+
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.HasOne("Models.Group", "GroupsUser")
@@ -390,6 +485,13 @@ namespace Inventario.Migrations
                     b.Navigation("Inventories");
 
                     b.Navigation("ProductImages");
+                });
+
+            modelBuilder.Entity("Models.ProductCode", b =>
+                {
+                    b.Navigation("Entries");
+
+                    b.Navigation("RegisterOfExits");
                 });
 
             modelBuilder.Entity("Models.WareHouse", b =>

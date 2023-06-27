@@ -82,7 +82,7 @@ namespace Inventario.Controllers
                 {
                     entry.CreationDate = DateTime.Now;
                     Inventory tmp = _context.Inventories.Where(I => I.InventoryId == entry.InventoryId).FirstOrDefault();
-                    tmp.QuantityOfExistances = tmp.QuantityOfExistances + entry.Quantity;
+                    
                     _context.Inventories.Update(tmp);
                     _context.Add(entry);
                     await _context.SaveChangesAsync();
