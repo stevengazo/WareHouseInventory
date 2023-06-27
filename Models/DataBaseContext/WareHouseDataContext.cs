@@ -13,8 +13,8 @@ namespace Models.DataBaseContext
         public DbSet<Product>? Products { get; set; }
         public DbSet<User>? Users { get; set; }
         public DbSet<RegisterOfExit>? RegisterOfExits { get; set; }
-        public DbSet<ProductCode>? Produc { get; set; }
-         public DbSet<WareHouse>? WareHouses { get; set; }
+        public DbSet<ProductCode>? ProductCodes { get; set; }
+        public DbSet<WareHouse>? WareHouses { get; set; }
 
         public WareHouseDataContext(DbContextOptions<WareHouseDataContext> options) : base(options)
         {

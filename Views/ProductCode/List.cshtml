@@ -1,0 +1,58 @@
+@model IEnumerable<Models.ProductCode>
+
+@{
+    ViewData["Title"] = "Lista de Codigos Activos";
+    Layout = "_LayoutAdmin";
+}
+
+<h4>Lista de Códigos Existentes</h4>
+
+<hr />
+
+<table class="table table-light">
+    <thead class="thead-light">
+        <tr>
+            <th>#</th>
+            <th>#</th>
+            <th>#</th>
+            <th>#</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Models.ProductCode item in Model)
+        {
+            <tr>
+                <td>
+                    @item.ProductCodeId
+                </td>
+                <td>
+                    @item.GenerationDate.Date.ToString("dd-MMMM-yy");
+                </td>
+                <td>
+                    @item.ExpirationDate.Date.ToString("dd-MMM-yy")
+                </td>
+                <td>
+                    @if (item.CanExpire)
+                    {
+                        <label>Este producto puede expirar</label>
+                    }
+                    else
+                    {
+                        <label>No tiene fecha de expiración</label>
+                    }
+                </td>
+                <td>
+                    @if (item.IsActive)
+                    {
+                        <label>No hay existencias</label>
+                    }
+                    else
+                    {
+                        <label>Hay Existencias</label>
+                    }
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
